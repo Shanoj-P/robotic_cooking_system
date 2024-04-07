@@ -1,0 +1,68 @@
+arm_controller:
+  type: position_controllers/JointTrajectoryController
+  joints:
+    - joint_base
+    - joint_link_1
+    - joint_link_2
+    - joint_link_3
+    - joint_link_4
+    - joint_gripper
+  gains:
+    joint_base:
+      p: 100
+      d: 1
+      i: 1
+      i_clamp: 1
+    joint_link_1:
+      p: 100
+      d: 1
+      i: 1
+      i_clamp: 1
+    joint_link_2:
+      p: 100
+      d: 1
+      i: 1
+      i_clamp: 1
+    joint_link_3:
+      p: 100
+      d: 1
+      i: 1
+      i_clamp: 1
+    joint_link_4:
+      p: 100
+      d: 1
+      i: 1
+      i_clamp: 1
+    joint_gripper:
+      p: 100
+      d: 1
+      i: 1
+      i_clamp: 1
+  constraints:
+          goal_time: 0.6
+          stopped_velocity_tolerance: 0.05
+          joint_base: {trajectory: 0.1, goal: 0.01}
+          joint_link_1: {trajectory: 0.1, goal: 0.01}
+          joint_link_2: {trajectory: 0.1, goal: 0.01}
+          joint_link_3: {trajectory: 0.1, goal: 0.01}
+          joint_link_4: {trajectory: 0.1, goal: 0.01}
+          joint_gripper: {trajectory: 0.1, goal: 0.01}
+  stop_trajectory_duration: 0.5
+  state_publish_rate: 25
+  action_monitor_rate: 10
+gripper_controller:
+  type: position_controllers/JointTrajectoryController
+  joints:
+    - joint_gripper_left
+    - joint_gripper_right
+  gains:
+    joint_gripper_left:
+      p: 100
+      d: 1
+      i: 1
+      i_clamp: 1
+    joint_gripper_right:
+      p: 100
+      d: 1
+      i: 1
+      i_clamp: 1

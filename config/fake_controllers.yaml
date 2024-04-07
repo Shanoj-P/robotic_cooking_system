@@ -1,0 +1,20 @@
+controller_list:
+  - name: fake_arm_controller
+    type: $(arg fake_execution_type)
+    joints:
+      - joint_base
+      - joint_link_1
+      - joint_link_2
+      - joint_link_3
+      - joint_link_4
+      - joint_gripper
+  - name: fake_gripper_controller
+    type: $(arg fake_execution_type)
+    joints:
+      - joint_gripper_left
+      - joint_gripper_right
+initial:  # Define initial robot poses per group
+  - group: arm
+    pose: home
+  - group: gripper
+    pose: closed

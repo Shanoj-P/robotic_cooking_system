@@ -1,0 +1,11 @@
+moveit_setup_assistant_config:
+  URDF:
+    package: cooking_robot
+    relative_path: urdf/primary_manipulator.xacro
+    xacro_args: ""
+  SRDF:
+    relative_path: config/primary_manipulator.srdf
+  CONFIG:
+    author_name: Shanoj P
+    author_email: shanojpvr001@gmail.com
+    generated_timestamp: 1712249610
