@@ -9,6 +9,7 @@ from math import pi
 from std_msgs.msg import String
 from moveit_commander.conversions import pose_to_list
 from math import radians
+import matplotlib.pyplot as plt
 
 class MoveGroup(object):
     def __init__(self) -> None:
@@ -53,21 +54,46 @@ class MoveGroup(object):
         return rpyrad
 
     def moveto_xyzrpy(self, xyzrpy):
-        self.group.set_pose_target(xyzrpy, end_effector_link = self.eef_link)
-        plan = self.group.go(wait = True)
+        self.group.set_pose_target(xyzrpy, end_effector_link=self.eef_link)
+        plan = self.group.go(wait=True)
         self.group.stop()
         self.group.clear_pose_targets()
         current_pose = self.group.get_current_pose().pose
+        return current_pose.position.x, current_pose.position.y, current_pose.position.z
 
 
 def main():
     try:
         armDriver = MoveGroup()
-        xyz = [0.4, -0.2, 0.4]
+        # xyz = [0.4, -0.2, 0.4]
         rpy = armDriver.rad([0, 0, 0])
-        xyzrpy = xyz + rpy
-        armDriver.moveto_xyzrpy(xyzrpy)
-        print("---------------completed---------------")
+        # xyzrpy = xyz + rpy
+        # armDriver.moveto_xyzrpy(xyzrpy)
+        square = [
+            [0.4, -0.2, 0.4],
+            [0.4, 0.2, 0.4],
+            [0.4, 0.2, 0.1],
+            [0.4, -0.2, 0.1],
+            [0.4, -0.2, 0.4]
+        ]
+        x_traj, y_traj, z_traj = [], [], []
+        
+        for i in square:
+            xyzrpy = i + rpy
+            x, y, z = armDriver.moveto_xyzrpy(xyzrpy)
+            x_traj.append(x)
+            y_traj.append(y)
+            z_traj.append(z)
+            print("---------------completed---------------")
+
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+        ax.plot(x_traj, y_traj, z_traj, marker='o', linestyle='-')
+        ax.set_xlabel('X')
+        ax.set_ylabel('Y')
+        ax.set_zlabel('Z')
+        plt.show()
+
     except rospy.ROSInterruptException:
         return
     except KeyboardInterrupt:
