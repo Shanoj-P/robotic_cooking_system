@@ -10,6 +10,7 @@ from std_msgs.msg import String
 from moveit_commander.conversions import pose_to_list
 from math import radians
 import matplotlib.pyplot as plt
+import numpy as np
 
 class MoveGroup(object):
     def __init__(self) -> None:
@@ -48,38 +49,53 @@ class MoveGroup(object):
         self.planning_frame = planning_Frame
         self.eef_link = 'link4_1'
         self.group_names = group_names
-
+    
+    
     def rad(self, rpy):
         rpyrad = [radians(rpy[0]), radians(rpy[1]), radians(rpy[2])]
         return rpyrad
 
     def moveto_xyzrpy(self, xyzrpy):
-        self.group.set_pose_target(xyzrpy, end_effector_link=self.eef_link)
+        xyzrpy_list = list(xyzrpy)
+    
+    # Set pose target with the converted list
+        self.group.set_pose_target(xyzrpy_list, end_effector_link=self.eef_link)
         plan = self.group.go(wait=True)
         self.group.stop()
         self.group.clear_pose_targets()
         current_pose = self.group.get_current_pose().pose
         return current_pose.position.x, current_pose.position.y, current_pose.position.z
 
+def generate_curve_points():
+    # Define a parameter range
+    num_points = 8 
+    t = np.linspace(0, 2*np.pi, num_points)
 
+    
+    # Define coefficients for the cubic polynomials
+    a_x, b_x, c_x, d_x = 0.05, 0.05, 0.05, 0.1  # Adjust coefficients for x(t) as needed
+    a_z, b_z, c_z, d_z = 0.05, 0.05, 0.05, 0.1  # Adjust coefficients for z(t) as needed
+
+    # Define parametric equations for x, y, z coordinates
+    x = np.clip(a_x*t**3 + b_x*t**2 + c_x*t + d_x, 0, 0.4)  # Clip to ensure x is non-negative and bounded by 0.4
+    y = np.clip(0.4 * np.sin(t), -0.4, 0.4)  # Clip to ensure absolute value of y is between 0 and 0.4
+    z = np.clip(a_z*t**3 + b_z*t**2 + c_z*t + d_z, 0, 0.4)  # Clip to ensure z is non-negative and bounded by 0.4
+
+    # Return a list of (x, y, z) points
+    return list(zip(x, y, z))
 def main():
     try:
         armDriver = MoveGroup()
-        # xyz = [0.4, -0.2, 0.4]
-        rpy = armDriver.rad([0, 90, 0])
-        # xyzrpy = xyz + rpy
-        # armDriver.moveto_xyzrpy(xyzrpy)
-        square = [
-            [0.4, -0.2, 0.4],
-            [0.4, 0.2, 0.4],
-            [0.4, 0.2, 0.1],
-            [0.4, -0.2, 0.1],
-            [0.4, -0.2, 0.4]
-        ]
+        rpy = armDriver.rad([0, 0, 0])
+
+
+        # Generate curve points
+        curve_points = generate_curve_points()
         x_traj, y_traj, z_traj = [], [], []
         
-        for i in square:
-            xyzrpy = i + rpy
+        for i in curve_points:
+            print(i)
+            xyzrpy = tuple(i) + tuple(rpy)
             x, y, z = armDriver.moveto_xyzrpy(xyzrpy)
             x_traj.append(x)
             y_traj.append(y)
@@ -96,8 +112,8 @@ def main():
 
     except rospy.ROSInterruptException:
         return
-    except KeyboardInterrupt:
-        return
+    # except KeyboardInterrupt:
+    #     return
 
 if __name__ == '__main__':
     main()
