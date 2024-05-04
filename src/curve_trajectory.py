@@ -68,8 +68,8 @@ class MoveGroup(object):
 
 def generate_curve_points():
     # Define a parameter range
-    num_points = 8 
-    t = np.linspace(0, 2*np.pi, num_points)
+    num_points = 20 
+    t = np.linspace(1, np.pi*2, num_points)
 
     # Define parametric equations for x, y, z coordinates
     x = 0.4 * np.abs(np.sin(t))  # Ensure x is non-negative

@@ -5,21 +5,32 @@
   <arg name="paused" default="false" doc="Start Gazebo paused"/>
   <arg name="world_name" default="worlds/empty.world" doc="Gazebo world file"/>
   <arg name="world_pose" default="-x 0 -y 0 -z 0 -R 0 -P 0 -Y 0" doc="Pose to spawn the robot at"/>
+  <arg name="world_pose1" default="-x 1 -y 0 -z 0 -R 0 -P 0 -Y 0" doc="Pose to spawn the robot at"/>
   <arg name="initial_joint_positions" default=" -J joint_base 0 -J joint_gripper 0 -J joint_gripper_left 0 -J joint_gripper_right 0 -J joint_link_1 0 -J joint_link_2 0 -J joint_link_3 0 -J joint_link_4 0" doc="Initial joint configuration of the robot"/>
 
+  <arg name="x" default="20"/>
+  <arg name="y" default="20"/>
+  <arg name="z" default="0"/>
+  <arg name="roll" default="0"/>
+  <arg name="pitch" default="0"/>
+  <arg name="yaw" default="0"/>
+
   <!-- Start Gazebo paused to allow the controllers to pickup the initial pose -->
-  <include file="$(find gazebo_ros)/launch/empty_world.launch" pass_all_args="true">
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
     <arg name="paused" value="true"/>
   </include>
 
   <!-- Set the robot urdf on the parameter server -->
   <param name="robot_description" textfile="$(find robotic_cooking_system)/config/gazebo_primary_manipulator.urdf" />
+  <param name="secondary_robot_description" command="$(find xacro)/xacro $(find secondary_manipulator_3DoF_description)/urdf/gazebo_secondary_manipulator_3DoF.xacro" />
 
   <!-- Unpause the simulation after loading the robot model -->
   <arg name="unpause" value="$(eval '' if arg('paused') else '-unpause')" />
 
   <!-- Spawn the robot in Gazebo -->
-  <node name="spawn_gazebo_model" pkg="gazebo_ros" type="spawn_model" args="-urdf -param robot_description -model robot $(arg unpause) $(arg world_pose) $(arg initial_joint_positions)"
+  <node name="spawn_gazebo_model1" pkg="gazebo_ros" type="spawn_model" args="-urdf -param robot_description -model dual_manipulator  $(arg unpause) $(arg world_pose) $(arg initial_joint_positions)"
+    respawn="false" output="screen" />
+  <node name="spawn_gazebo_model2" pkg="gazebo_ros" type="spawn_model" args="-urdf -param secondary_robot_description -model secondary_manipulator_3DoF $(arg world_pose1)"
     respawn="false" output="screen" />
 
   <!-- Load the controller parameters onto the parameter server -->

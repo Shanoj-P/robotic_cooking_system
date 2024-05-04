@@ -53,25 +53,29 @@ class MoveGroup(object):
         return rpyrad
 
     def moveto_xyzrpy(self, xyzrpy):
+        current_pose = self.group.get_current_pose().pose
         self.group.set_pose_target(xyzrpy, end_effector_link = self.eef_link)
         plan = self.group.go(wait = True)
         self.group.stop()
         self.group.clear_pose_targets()
-        current_pose = self.group.get_current_pose().pose
+        return current_pose
 
 
 def main():
     try:
-        armDriver = MoveGroup()
-        xyz = [0.4, -0.2, 0.4]
-        rpy = armDriver.rad([0, 0, 0])
-        xyzrpy = xyz + rpy
-        armDriver.moveto_xyzrpy(xyzrpy)
-        print("---------------completed---------------")
+        while True:
+            armDriver = MoveGroup()
+            xyz = [0.3, 0.2, 0.4]
+            rpy = armDriver.rad([0, 90, 0])
+            xyzrpy = xyz + rpy
+            current_pose = armDriver.moveto_xyzrpy(xyzrpy)
+            armDriver.moveto_xyzrpy(current_pose)
+
+            print("---------------completed---------------")
     except rospy.ROSInterruptException:
         return
     except KeyboardInterrupt:
-        return
+        exit()
 
 if __name__ == '__main__':
     main()
